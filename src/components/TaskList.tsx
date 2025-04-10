@@ -98,7 +98,7 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
                     key={task.id}
                     className={`p-4 rounded-lg flex justify-between items-center transition-all ${
                         task.completed
-                            ? 'bg-gray-50 border border-sky-900 shadow'
+                            ? 'bg-gray-200 border border-sky-900 shadow'
                             : 'bg-white border border-sky-800 shadow-lg'
                     }
                     `}
