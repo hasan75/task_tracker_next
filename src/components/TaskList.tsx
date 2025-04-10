@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toggleTaskCompletion, deleteTask } from '@/utils/apis';
-import { FiCheck, FiTrash2, FiEdit } from 'react-icons/fi';
+import { FiCheck, FiTrash2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
 
@@ -13,23 +13,33 @@ interface Task {
 }
 
 interface TaskListProps {
-    tasks: Task[]
-    loading: boolean
-    onTasksUpdated: () => void
-    setExistingTasks: (titles: string[]) => void // Add this line
+    tasks: Task[];
+    loading: boolean;
+    onTasksUpdated: () => void;
+    setExistingTasks: (titles: string[]) => void;
 }
 
 export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTasks }: TaskListProps) {
     const [localTasks, setLocalTasks] = useState<Task[]>([]);
+    const [sortedTasks, setSortedTasks] = useState<Task[]>([]);
 
-// Add this useEffect to update existing tasks when tasks change
+    // Sort tasks with completed ones at the bottom
+    useEffect(() => {
+        const sorted = [...localTasks].sort((a, b) => {
+            if (a.completed === b.completed) return 0;
+            return a.completed ? 1 : -1;
+        });
+        setSortedTasks(sorted);
+    }, [localTasks]);
+
+    // Update existing tasks when tasks change
     useEffect(() => {
         if (tasks) {
             setLocalTasks(tasks);
             localStorage.setItem('tasks', JSON.stringify(tasks));
-            setExistingTasks(tasks.map(task => task.title)) ;// Add this line
+            setExistingTasks(tasks.map(task => task.title));
         }
-    }, [tasks, setExistingTasks]) // Add setExistingTasks to dependencies
+    }, [tasks, setExistingTasks]);
 
     useEffect(() => {
         const cachedTasks = localStorage.getItem('tasks');
@@ -42,6 +52,14 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
         try {
             const updatedTask = await toggleTaskCompletion(id);
             onTasksUpdated();
+
+            // Optimistic UI update with transition
+            setLocalTasks(prevTasks =>
+                prevTasks.map(task =>
+                    task.id === id ? { ...task, completed: updatedTask.completed } : task
+                )
+            );
+
             toast.success(
                 `Task marked as ${updatedTask.completed ? 'complete' : 'incomplete'}!`,
                 {
@@ -52,7 +70,7 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
                         border: '1px solid #00DC82',
                     },
                 }
-            )
+            );
         } catch (error) {
             console.error('Failed to toggle task:', error);
             toast.error('Failed to update task status', {
@@ -61,7 +79,7 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
                     color: '#fff',
                     border: '1px solid #ff4d4f',
                 },
-            })
+            });
         }
     };
 
@@ -76,7 +94,7 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
                     color: '#fff',
                     border: '1px solid #00DC82',
                 },
-            })
+            });
         } catch (error) {
             console.error('Failed to delete task:', error);
             toast.error('Failed to delete task', {
@@ -86,34 +104,33 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
                     border: '1px solid #ff4d4f',
                 },
             });
-        };
+        }
     };
 
-    if (loading) return <p className="text-center text-gray-600">Loading tasks...</p>
+    if (loading) return <p className="text-center text-gray-600">Loading tasks...</p>;
 
     return (
-        <ul className="space-y-3">
-            {localTasks.map((task) => (
+        <ul className="space-y-3 transition-all duration-300 ease-in-out">
+            {sortedTasks.map((task) => (
                 <li
                     key={task.id}
-                    className={`p-4 rounded-lg flex justify-between items-center transition-all ${
+                    className={`p-4 rounded-lg flex justify-between items-center transition-all duration-300 ease-in-out ${
                         task.completed
-                            ? 'bg-gray-200 border border-sky-900 shadow'
+                            ? 'bg-gray-200 border border-sky-900 shadow translate-y-2'
                             : 'bg-white border border-sky-800 shadow-lg'
-                    }
-                    `}
+                    }`}
                 >
-          <span
-              className={`flex-1 ${
-                  task.completed ? 'line-through text-gray-400' : 'text-gray-800'
-              }`}
-          >
-            {task.title}
-          </span>
+                    <span
+                        className={`flex-1 transition-all duration-300 ${
+                            task.completed ? 'line-through text-gray-400' : 'text-gray-800'
+                        }`}
+                    >
+                        {task.title}
+                    </span>
                     <div className="flex gap-2">
                         <button
                             onClick={() => handleToggle(task.id)}
-                            className={`p-2 rounded-full transition-colors cursor-pointer ${
+                            className={`p-2 rounded-full transition-all duration-300 ease-in-out ${
                                 task.completed
                                     ? 'bg-green-700 text-white hover:bg-green-50 hover:text-gray-800'
                                     : 'bg-green-50 text-gray-800 hover:bg-green-600 hover:text-white'
@@ -127,7 +144,7 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
                         <ConfirmationDialog
                             trigger={
                                 <button
-                                    className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-300 hover:text-red-500 transition-colors cursor-pointer"
+                                    className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-300 hover:text-red-500 transition-colors duration-300 ease-in-out"
                                     aria-label="Delete task"
                                     title="Delete task"
                                 >
