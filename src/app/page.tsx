@@ -17,6 +17,7 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [existingTasks, setExistingTasks] = useState<string[]>([]);
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -46,7 +47,10 @@ export default function Home() {
         <main className="container mx-auto px-4 max-w-md min-h-[550px] min-w-[450px] bg-gray-100 py-8 rounded-md shadow-xl">
           <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Task Tracker</h1>
 
-          <AddTask onTaskAdded={fetchTasks} />
+          <AddTask
+              onTaskAdded={fetchTasks}
+              existingTasks={existingTasks}
+          />
 
           {error && (
               <div className="p-4 mb-4 bg-red-900/50 text-red-100 rounded-lg border border-red-700">
@@ -61,6 +65,7 @@ export default function Home() {
                   tasks={tasks}
                   loading={loading}
                   onTasksUpdated={fetchTasks}
+                  setExistingTasks={setExistingTasks}
               />
           )}
         </main>

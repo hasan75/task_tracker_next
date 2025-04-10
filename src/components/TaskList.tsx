@@ -16,17 +16,20 @@ interface TaskListProps {
     tasks: Task[]
     loading: boolean
     onTasksUpdated: () => void
+    setExistingTasks: (titles: string[]) => void // Add this line
 }
 
-export default function TaskList({ tasks, loading, onTasksUpdated }: TaskListProps) {
+export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTasks }: TaskListProps) {
     const [localTasks, setLocalTasks] = useState<Task[]>([]);
 
+// Add this useEffect to update existing tasks when tasks change
     useEffect(() => {
         if (tasks) {
             setLocalTasks(tasks);
             localStorage.setItem('tasks', JSON.stringify(tasks));
+            setExistingTasks(tasks.map(task => task.title)) ;// Add this line
         }
-    }, [tasks]);
+    }, [tasks, setExistingTasks]) // Add setExistingTasks to dependencies
 
     useEffect(() => {
         const cachedTasks = localStorage.getItem('tasks');

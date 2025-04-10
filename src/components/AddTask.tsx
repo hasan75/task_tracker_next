@@ -1,24 +1,47 @@
 import { useState } from 'react';
 import { addTask } from '@/utils/apis';
+import toast from 'react-hot-toast';
 
-export default function AddTask ({ onTaskAdded }){
+interface AddTaskProps {
+    onTaskAdded: () => void;
+    existingTasks: string[];
+}
+
+export default function AddTask({ onTaskAdded, existingTasks }: AddTaskProps) {
     const [title, setTitle] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title.trim()) return;
+        const trimmedTitle = title.trim();
+
+        if (!trimmedTitle) {
+            toast.error('Task title cannot be empty');
+            return;
+        };
+
+        // Check for duplicates (case-insensitive)
+        const isDuplicate = existingTasks.some(
+            task => task.toLowerCase() === trimmedTitle.toLowerCase()
+        );
+
+        if (isDuplicate) {
+            toast.error('This task already exists!');
+            return;
+        };
 
         setIsLoading(true);
         try {
-            await addTask(title);
+            await addTask(trimmedTitle);
             setTitle('');
             onTaskAdded();
+            toast.success('Task added successfully!');
         } catch (error) {
             console.error('Failed to add task:', error);
+            toast.error('Failed to add task');
         } finally {
             setIsLoading(false);
-        }
+        };
     };
 
     return (
