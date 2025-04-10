@@ -2,13 +2,6 @@
 
 import * as Dialog from '@radix-ui/react-dialog'
 
-type ConfirmationDialogProps = {
-    trigger: React.ReactNode
-    title: string
-    description: string
-    onConfirm: () => void
-}
-
 export default function ConfirmationDialog({
                                                trigger,
                                                title,
