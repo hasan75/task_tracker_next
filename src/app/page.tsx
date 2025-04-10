@@ -7,7 +7,13 @@ import Spinner from '@/components/Spinner';
 import AddTask from '@/components/AddTask';
 import TaskList from '@/components/TaskList';
 
-const Home= () => {
+interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +37,7 @@ const Home= () => {
   }, []);
 
   return (
-      <div className="">
+      <div className="py-4">
         <Head>
           <title>Task Tracker</title>
           <meta name="description" content="A simple task tracking application" />
@@ -43,7 +49,7 @@ const Home= () => {
           <AddTask onTaskAdded={fetchTasks} />
 
           {error && (
-              <div className="p-4 mb-4 bg-red-100 text-red-700 rounded-lg">
+              <div className="p-4 mb-4 bg-red-900/50 text-red-100 rounded-lg border border-red-700">
                 {error}
               </div>
           )}
@@ -61,5 +67,3 @@ const Home= () => {
       </div>
   );
 };
-
-export default Home;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { addTask } from '@/utils/apis';
 
-const AddTask = ({ onTaskAdded }) => {
+export default function AddTask ({ onTaskAdded }){
     const [title, setTitle] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -29,12 +29,12 @@ const AddTask = ({ onTaskAdded }) => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Add a new task..."
-                    className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 border border-sky-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600"
                 />
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-4 py-2 bg-sky-900 text-white rounded-lg hover:bg-sky-950 disabled:bg-blue-300 transition-colors"
+                    className="px-4 py-2 bg-sky-900 text-white rounded-lg hover:bg-sky-950 disabled:opacity-50 transition-colors cursor-pointer"
                 >
                     {isLoading ? 'Adding...' : 'Add Task'}
                 </button>
@@ -42,5 +42,3 @@ const AddTask = ({ onTaskAdded }) => {
         </form>
     );
 };
-
-export default AddTask;
