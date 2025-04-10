@@ -53,7 +53,7 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
             const updatedTask = await toggleTaskCompletion(id);
             onTasksUpdated();
 
-            // Optimistic UI update with transition
+            // Optimistic UI update
             setLocalTasks(prevTasks =>
                 prevTasks.map(task =>
                     task.id === id ? { ...task, completed: updatedTask.completed } : task
@@ -110,54 +110,72 @@ export default function TaskList({ tasks, loading, onTasksUpdated, setExistingTa
     if (loading) return <p className="text-center text-gray-600">Loading tasks...</p>;
 
     return (
-        <ul className="space-y-3 transition-all duration-300 ease-in-out">
-            {sortedTasks.map((task) => (
-                <li
-                    key={task.id}
-                    className={`p-4 rounded-lg flex justify-between items-center transition-all duration-300 ease-in-out ${
-                        task.completed
-                            ? 'bg-gray-200 border border-sky-900 shadow translate-y-2'
-                            : 'bg-white border border-sky-800 shadow-lg'
-                    }`}
-                >
-                    <span
-                        className={`flex-1 transition-all duration-300 ${
-                            task.completed ? 'line-through text-gray-400' : 'text-gray-800'
-                        }`}
-                    >
-                        {task.title}
-                    </span>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => handleToggle(task.id)}
-                            className={`p-2 rounded-full transition-all duration-300 ease-in-out ${
-                                task.completed
-                                    ? 'bg-green-700 text-white hover:bg-green-50 hover:text-gray-800'
-                                    : 'bg-green-50 text-gray-800 hover:bg-green-600 hover:text-white'
-                            }`}
-                            title={task.completed ? 'Mark incomplete' : 'Mark complete'}
-                            aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
-                        >
-                            <FiCheck size={18} />
-                        </button>
+        <ul className="space-y-3">
+            {sortedTasks.map((task, index) => {
+                // Check if we need to show the divider
+                const showDivider = task.completed &&
+                    (index === 0 || !sortedTasks[index - 1].completed);
 
-                        <ConfirmationDialog
-                            trigger={
+                return (
+                    <div key={task.id}>
+                        {showDivider && (
+                            <div className="relative py-4">
+                                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                                    <div className="w-full border-t border-gray-300" />
+                                </div>
+                                <div className="relative flex justify-center">
+                                    <span className="px-4 py-1 bg-white text-sm text-gray-500 rounded-md">
+                                        Completed Tasks
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                        <li
+                            className={`p-4 rounded-lg flex justify-between items-center transition-all duration-300 ease-in-out ${
+                                task.completed
+                                    ? 'bg-gray-200 shadow border border-gray-300'
+                                    : 'bg-white border border-sky-200 shadow-sm'
+                            }`}
+                        >
+                            <span
+                                className={`flex-1 ${
+                                    task.completed ? 'line-through text-gray-500' : 'text-gray-800'
+                                }`}
+                            >
+                                {task.title}
+                            </span>
+                            <div className="flex gap-2">
                                 <button
-                                    className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-300 hover:text-red-500 transition-colors duration-300 ease-in-out"
-                                    aria-label="Delete task"
-                                    title="Delete task"
+                                    onClick={() => handleToggle(task.id)}
+                                    className={`p-2 rounded-full transition-colors cursor-pointer ${
+                                        task.completed
+                                            ? 'bg-green-300 text-sky-900 hover:bg-green-200'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                    }`}
+                                    title={task.completed ? 'Mark incomplete' : 'Mark complete'}
+                                    aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
                                 >
-                                    <FiTrash2 size={18} />
+                                    <FiCheck size={18} />
                                 </button>
-                            }
-                            title="Delete Task"
-                            description="Are you sure you want to delete this task? This action cannot be undone."
-                            onConfirm={() => handleDelete(task.id)}
-                        />
+                                <ConfirmationDialog
+                                    trigger={
+                                        <button
+                                            className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 cursor-pointer"
+                                            aria-label="Delete task"
+                                            title="Delete task"
+                                        >
+                                            <FiTrash2 size={18} />
+                                        </button>
+                                    }
+                                    title="Delete Task"
+                                    description="Are you sure you want to delete this task? This action cannot be undone."
+                                    onConfirm={() => handleDelete(task.id)}
+                                />
+                            </div>
+                        </li>
                     </div>
-                </li>
-            ))}
+                );
+            })}
         </ul>
     );
 };
