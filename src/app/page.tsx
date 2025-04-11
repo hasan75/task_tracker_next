@@ -38,14 +38,15 @@ export default function Home() {
   }, []);
 
   return (
-      <div className="py-4">
+      <div className="py-4 px-2">
         <Head>
           <title>Task Tracker</title>
           <meta name="description" content="A simple task tracking application" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
 
-        <main className="container mx-auto px-4 max-w-md min-h-[550px] min-w-[450px] bg-gray-100 py-8 rounded-md shadow-xl">
-          <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Task Tracker</h1>
+        <main className="mx-auto px-4 w-full max-w-md min-h-[550px] bg-gray-100 py-8 rounded-md shadow-xl">
+          <h1 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-800">Task Tracker</h1>
 
           <AddTask
               onTaskAdded={fetchTasks}
